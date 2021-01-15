@@ -1,4 +1,4 @@
-package com.example.demo
+package com.mgstest
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 class WSConfig : WebSocketConfigurer {
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
-        registry.addHandler(MessageHandler(), "/gs-guide-websocket").withSockJS()
+        registry.addHandler(MessageHandler(), "/websocket").withSockJS()
     }
 }
 

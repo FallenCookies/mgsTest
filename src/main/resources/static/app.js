@@ -37,18 +37,9 @@ function receiveMsg(msg) {
                       html += "</tr></table>";
                       document.getElementById("sequences").innerHTML = html;
             }
-            else if (msg.msgType == "join") {
-                addUser(msg.data);
-            }
-            else if (msg.msgType == "users") {
-                msg.data.forEach(function(el) { addUser(el); });
-            }
-            else if (msg.msgType == "left") {
-                $("#user-"+msg.data.id).remove();
-            }
         }
 function connect() {
-    socket = new SockJS('/gs-guide-websocket');
+    socket = new SockJS('/websocket');
      socket.onmessage = function(msg) {
         receiveMsg(JSON.parse(msg.data));
      };
