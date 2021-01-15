@@ -19,11 +19,12 @@ class MessageHandler : TextWebSocketHandler() {
 
     var currentSession: WebSocketSession? = null
     var isGenerating = AtomicBoolean(false)
+    var primeGenerator = PrimeGenerator()
     var watcher = GlobalScope.launch {
         while (true) {
             delay(1000L)
             if (isGenerating.get()) {
-                emit(currentSession, Message("sequences", getSequences()))
+                emit(currentSession, Message("sequences", primeGenerator.getSequences()))
             }
         }
     }
@@ -49,13 +50,13 @@ class MessageHandler : TextWebSocketHandler() {
                     emit(currentSession, Message("sequences", ""))
                     return
                 }
-                generatePrimeMatrix(length)
-                emit(currentSession, Message("sequences", getSequences()))
+                primeGenerator.generatePrimeMatrix(length)
+                emit(currentSession, Message("sequences", primeGenerator.getSequences()))
             }
             "/autoGenerate" -> {
                 isGenerating.set(json.get("isGenerating").asBoolean())
-                if (primeMatrix.isEmpty())
-                    generatePrimeMatrix(Random.nextInt(10, 100))
+                if (primeGenerator.isMatrixEmpty())
+                    primeGenerator.generatePrimeMatrix(Random.nextInt(10, 100))
             }
         }
     }
