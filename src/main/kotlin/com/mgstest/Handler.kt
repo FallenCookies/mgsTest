@@ -24,7 +24,7 @@ class MessageHandler() : TextWebSocketHandler() {
     init {
         GlobalScope.launch {
             while (true) {
-                delay(1000L)
+                delay(10000L)
                 if (isGenerating.get()) {
                     emit(currentSession, Message("sequences", primeGenerator.getSequences()))
                 }
