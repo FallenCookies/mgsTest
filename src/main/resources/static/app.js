@@ -1,64 +1,82 @@
-var stompClient = null;
+var socket = null;
 var isGenerating = false;
+
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
+    $("#send").prop("disabled", !connected);
+    $("#autoGenerate").prop("disabled", !connected);
     if (connected) {
         $("#conversation").show();
     }
     else {
         $("#conversation").hide();
+        document.getElementById("isGeneratingCheckbox").checked = isGenerating;
     }
-    $("#greetings").html("");
+    $("#sequences").html("");
 }
+function receiveMsg(msg) {
+            if (msg.msgType == "sequences") {
+                var data = msg.data
+                    var perrow = 1, // 1 cells per row
+                          html = "<table><tr>";
 
+                      // Loop through array and add table cells
+                      for (var i=0; i<data.length; i++) {
+                        html += "<td>" + data[i] + "</td>";
+
+                        // If you need to click on the cell and do something
+                        // html += "<td onclick='FUNCTION()'>" + data[i] + "</td>";
+
+                        // Break into next row
+                        var next = i+1;
+                        if (next%perrow==0 && next!=data.length) {
+                          html += "</tr><tr>";
+                        }
+                      }
+                      html += "</tr></table>";
+                      document.getElementById("sequences").innerHTML = html;
+            }
+            else if (msg.msgType == "join") {
+                addUser(msg.data);
+            }
+            else if (msg.msgType == "users") {
+                msg.data.forEach(function(el) { addUser(el); });
+            }
+            else if (msg.msgType == "left") {
+                $("#user-"+msg.data.id).remove();
+            }
+        }
 function connect() {
-    var socket = new SockJS('/gs-guide-websocket');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/greetings', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
-        });
-    });
+    socket = new SockJS('/gs-guide-websocket');
+     socket.onmessage = function(msg) {
+        receiveMsg(JSON.parse(msg.data));
+     };
+     socket.onopen = function() {
+         console.log('open');
+         setConnected(true)
+     };
+     socket.onclose = function() {
+          console.log('close');
+          setConnected(false)
+      };
+
 }
 
 function disconnect() {
-    if (stompClient !== null) {
-        stompClient.disconnect();
+    if (socket !== null) {
+        socket.close();
     }
-    setConnected(false);
-    console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/generate", {}, JSON.stringify({'length': $("#length").val()}));
+function sendLength() {
+    socket.send(JSON.stringify({ 'type': '/generate', 'length': $("#length").val() }));
 }
 function startGenerating() {
-    stompClient.send("/app/autoGenerate", {}, JSON.stringify({'isGenerating': !isGenerating}));
     isGenerating = !isGenerating
-}
-function showGreeting(message) {
-    var data = message
-    var perrow = 1, // 1 cells per row
-          html = "<table><tr>";
+    document.getElementById("isGeneratingCheckbox").checked = isGenerating;
+    socket.send(JSON.stringify({ 'type': '/autoGenerate', 'isGenerating': isGenerating }));
 
-      // Loop through array and add table cells
-      for (var i=0; i<data.length; i++) {
-        html += "<td>" + data[i] + "</td>";
-
-        // If you need to click on the cell and do something
-        // html += "<td onclick='FUNCTION()'>" + data[i] + "</td>";
-
-        // Break into next row
-        var next = i+1;
-        if (next%perrow==0 && next!=data.length) {
-          html += "</tr><tr>";
-        }
-      }
-      html += "</tr></table>";
-      document.getElementById("greetings").innerHTML = html;
 }
 
 $(function () {
@@ -67,6 +85,6 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { sendLength(); });
     $( "#autoGenerate" ).click(function() { startGenerating(); });
 });

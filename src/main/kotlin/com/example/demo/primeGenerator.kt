@@ -6,24 +6,24 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
 val primeArray = generatePrimeArray()
-var primeMatrix = ArrayList<List<Int>>()
+var primeMatrix = listOf<List<Int>>()
 fun generatePrimeMatrix(rowSize: Int) {
 
-    val resultMatrix: ArrayList<List<Int>> = ArrayList()
+    val resultMatrix = mutableListOf<List<Int>>()
     repeat(5) {
         resultMatrix.add(primeArray.shuffled().subList(0,rowSize))
     }
     primeMatrix = resultMatrix
 }
-fun getSequences(): ArrayList<List<Int>>{
-    var resultSequences: ArrayList<List<Int>> = ArrayList()
+fun getSequences(): MutableList<List<Int>>{
+    val resultSequences = mutableListOf<List<Int>>()
     for(row in primeMatrix){
         resultSequences.add(row.shuffled().subList(0,6))
     }
     return resultSequences
 }
 fun generatePrimeArray(): List<Int> {
-    val primes: ArrayList<Int> = ArrayList()
+    val primes = mutableListOf<Int>()
     runBlocking {
         var cur = numbersFrom(2)
         repeat(1000) {
