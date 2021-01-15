@@ -19,11 +19,11 @@ class MessageHandler : TextWebSocketHandler() {
 
     var currentSession: WebSocketSession? = null
     var isGenerating = AtomicBoolean(false)
-    var watcher = GlobalScope.launch { // launch a new coroutine in background and continue
+    var watcher = GlobalScope.launch {
         while (true) {
-            delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
+            delay(1000L)
             if (isGenerating.get()) {
-                emit(currentSession, Message("sequences", getSequences())) // print after delay
+                emit(currentSession, Message("sequences", getSequences()))
             }
         }
     }

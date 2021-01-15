@@ -18,17 +18,12 @@ function setConnected(connected) {
 function receiveMsg(msg) {
             if (msg.msgType == "sequences") {
                 var data = msg.data
-                    var perrow = 1, // 1 cells per row
+                    var perrow = 1,
                           html = "<table><tr>";
 
-                      // Loop through array and add table cells
                       for (var i=0; i<data.length; i++) {
                         html += "<td>" + data[i] + "</td>";
 
-                        // If you need to click on the cell and do something
-                        // html += "<td onclick='FUNCTION()'>" + data[i] + "</td>";
-
-                        // Break into next row
                         var next = i+1;
                         if (next%perrow==0 && next!=data.length) {
                           html += "</tr><tr>";
