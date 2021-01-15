@@ -15,16 +15,19 @@ import kotlin.random.Random
 
 class Message(val msgType: String, val data: Any)
 
-class MessageHandler : TextWebSocketHandler() {
+class MessageHandler() : TextWebSocketHandler() {
 
-    var currentSession: WebSocketSession? = null
-    var isGenerating = AtomicBoolean(false)
-    var primeGenerator = PrimeGenerator()
-    var watcher = GlobalScope.launch {
-        while (true) {
-            delay(1000L)
-            if (isGenerating.get()) {
-                emit(currentSession, Message("sequences", primeGenerator.getSequences()))
+    private var currentSession: WebSocketSession? = null
+    private var isGenerating = AtomicBoolean(false)
+    private var primeGenerator = PrimeGenerator()
+
+    init {
+        GlobalScope.launch {
+            while (true) {
+                delay(1000L)
+                if (isGenerating.get()) {
+                    emit(currentSession, Message("sequences", primeGenerator.getSequences()))
+                }
             }
         }
     }
@@ -37,6 +40,7 @@ class MessageHandler : TextWebSocketHandler() {
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
         currentSession = session
+
     }
 
     public override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
