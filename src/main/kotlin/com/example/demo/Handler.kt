@@ -23,7 +23,7 @@ class MessageHandler : TextWebSocketHandler() {
         while (true) {
             delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
             if (isGenerating.get()) {
-                emit(currentSession,Message("sequences", getSequences())) // print after delay
+                emit(currentSession, Message("sequences", getSequences())) // print after delay
             }
         }
     }
@@ -60,8 +60,7 @@ class MessageHandler : TextWebSocketHandler() {
         }
     }
 
-    private fun emit(session: WebSocketSession?, msg: Message){
-        if(session != null)
-            session.sendMessage(TextMessage(jacksonObjectMapper().writeValueAsString(msg)))
+    private fun emit(session: WebSocketSession?, msg: Message) {
+        session?.sendMessage(TextMessage(jacksonObjectMapper().writeValueAsString(msg)))
     }
 }
